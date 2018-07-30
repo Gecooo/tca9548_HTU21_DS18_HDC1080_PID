@@ -22,8 +22,8 @@
 // Data wire is plugged into port 2 on the Arduino
 #define ONE_WIRE_BUS 2
 
-#define INT1 11 // H-bridge leg 1 ->INT1
-#define INT2 12 // H-bridge leg 2 ->INT2
+#define hbridge1 11 // H-bridge leg 1 ->INT1
+#define hbridge2 12 // H-bridge leg 2 ->INT2
 
 // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 OneWire oneWire(ONE_WIRE_BUS);
@@ -68,32 +68,32 @@ void setup() {
   Serial.println("HTU21D Example!");
  Timer1_Initialize();
   //InitTimersSafe();
-  SetPinFrequencySafe(INT1, 25000);
-  SetPinFrequencySafe(INT2, 25000);
-   myPID.SetOutputLimits(10000,63000);    //лимит PID  
+  SetPinFrequencySafe(hbridge1, 25000);
+  SetPinFrequencySafe(hbridge2, 25000);
+   myPID.SetOutputLimits(10000,63500);    //лимит PID  
    myPID.SetSampleTime(1000);
   sensors.begin();
   //delay(50);
   /* Initialise the 1st sensor */
   tcaselect(0);
 myHumidity1.begin();
-myHumidity1.setResolution(HTU21D_RES_RH12_TEMP14);
+//myHumidity1.setResolution(HTU21D_RES_RH12_TEMP14);
 
   tcaselect(2); 
   hdc1080.begin(0x40); 
-  hdc1080.setResolution(1, 01);
+  //hdc1080.setResolution(1, 01);
     
     /* Initialise the 2nd sensor */
   tcaselect(5);
    myHumidity2.begin();
-   myHumidity1.setResolution(HTU21D_RES_RH12_TEMP14);
+   //myHumidity1.setResolution(HTU21D_RES_RH12_TEMP14);
 
 Serial.println("HTU21D --- OK");
 delay(1000);
 }
 
 void Pidregulator() {
-  Setpoint = -5.00;
+  Setpoint = 0.00;
    Input = Seredtemp;
     double gap = abs(Setpoint-Input);  //определение агрессивной настройки PID- регулятора
     if(gap<1.50)
@@ -108,13 +108,13 @@ void Pidregulator() {
     if (Hottemp >=50.0 || Hottemp2 >=50.0)
      {
       myPID.SetMode(MANUAL);
-      pwmWriteHR(INT1, 50);
-      digitalWrite(INT2, LOW);                                                       
+      pwmWriteHR(hbridge1, 50);
+      digitalWrite(hbridge2, LOW);                                                       
       }
      else {
       myPID.SetMode(AUTOMATIC); 
-      pwmWriteHR(INT1, Output);
-      digitalWrite(INT2, LOW);
+      pwmWriteHR(hbridge1, Output);
+      digitalWrite(hbridge2, LOW);
      // Serial.print("Output = ");Serial.println(Output);
   }
  // wdt_reset();
